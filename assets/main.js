@@ -13,3 +13,12 @@ function enviarPeticion(url, datos, callback){
         }
     })
 }
+
+function parsearFormulario(formulario){
+    let datosFormulario = $(formulario).serializeArray()
+    let datos = {}
+    for(let i = 0; i < datosFormulario.length; i++){
+        datos[datosFormulario[i].name] = datosFormulario[i].value
+    }
+    return datos
+}

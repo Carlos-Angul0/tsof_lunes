@@ -49,6 +49,10 @@
                                 <input class="form-control" type="number" name="cedula" id="cedula">
                             </div>
                             <div class="mb-3">
+                                <label class="form-label" for="altura">Altura:</label>
+                                <input class="form-control" type="number" name="altura" id="altura">
+                            </div>
+                            <div class="mb-3">
                                 <label class="form-label" for="fn">Fecha nacimiento:</label>
                                 <input class="form-control" type="date" name="fn" id="fn">
                             </div>
@@ -97,7 +101,8 @@
                 //Insertar
                 $('#formulario').on('submit', function(e){
                     e.preventDefault()
-                    enviarPeticion('insertar.php', {nombre: $('#nombre').val(),cedula: $('#cedula').val(),fn: $('#fn').val()}, function(respuesta){
+                    let datos = parsearFormulario($('#formulario'))                    
+                    enviarPeticion('insertar.php', datos, function(respuesta){
                         if(respuesta.ejecuto){
                                 $('#contenido').append(`<tr id="${respuesta.id}">
                                                 <td>${$('#nombre').val()}</td>
