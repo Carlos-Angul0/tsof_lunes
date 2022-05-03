@@ -1,20 +1,174 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Prueba</title>
-	<link rel="stylesheet" type="text/css" href="node_modules/bootstrap/dis/css/bootstrap.min.css">
-</head>
-<body>
-	<h1>no</h1>
-	<p>Esto es un parrafo</p>
-	<img src="imagen.png">
-	<p>aqui que va o que</p>
-	<tr>
-		<p>
-			oe oe oe oe oeo oe oe
-		</p>
-	</tr>
-</body>
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+        <title>Proyecto 1</title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row mt-5">
+                <div class="col">
+                    <button type="button" class="btn btn-primary" id="nuevo">
+                        Nueva persona
+                      </button>
+                </div>
+            </div>
+            <div class="row mt-5">
+                <div class="col">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Cédula</th>
+                                <th>Fecha de nacimiento</th>
+                            </tr>
+                        </thead>
+                        <tbody id="contenido"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Crear persona</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formulario">
+                            <div class="mb-3">
+                                <label class="form-label" for="nombre">Nombre:</label>
+                                <input class="form-control" type="text" name="nombre" id="nombre" required="required">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="cedula">Cédula:</label>
+                                <input class="form-control" type="number" name="cedula" id="cedula">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="fn">Fecha nacimiento:</label>
+                                <input class="form-control" type="date" name="fn" id="fn">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" type="submit" form="formulario" id="guardar">Guardar</button>
+                        <button class="btn btn-secondary" type="button" id="actualizar">Actualizar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="assets/main.js"></script>
+        <script type="text/javascript">
+            var id = 0
+            var mymodal = new bootstrap.Modal(document.getElementById('modal'), {
+                keyboard: false
+            })
+            $(function(){
+                //Ocultar boton
+                $('#actualizar').hide()
+
+                $('#nuevo').on('click', function(){
+                    mymodal.show()
+                    $('#formulario')[0].reset()
+                })
+
+                //Consultar
+                enviarPeticion('consultar.php', {}, function(respuesta){
+                    for(let i = 0; i < respuesta.registros.length; i++){
+                        $('#contenido').append(`<tr id="${respuesta.registros[i].id}">
+                                                    <td>${respuesta.registros[i].nombre}</td>
+                                                    <td>${respuesta.registros[i].cedula}</td>
+                                                    <td>${respuesta.registros[i].fecha_nacimiento}</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-success" onClick="editar(${respuesta.registros[i].id},'${respuesta.registros[i].nombre}',${respuesta.registros[i].cedula},'${respuesta.registros[i].fecha_nacimiento}')">Editar</button>
+                                                        <button class="btn btn-sm btn-danger" onClick="borrar(${respuesta.registros[i].id})">Borrar</button>
+                                                    </td>
+                                                </tr>`)
+                    }
+                })
+
+                //Insertar
+                $('#formulario').on('submit', function(e){
+                    e.preventDefault()
+                    enviarPeticion('insertar.php', {nombre: $('#nombre').val(),cedula: $('#cedula').val(),fn: $('#fn').val()}, function(respuesta){
+                        if(respuesta.ejecuto){
+                                $('#contenido').append(`<tr id="${respuesta.id}">
+                                                <td>${$('#nombre').val()}</td>
+                                                <td>${$('#cedula').val()}</td>
+                                                <td>${$('#fn').val()}</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-success" onClick="editar(${respuesta.id},'${$('#nombre').val()}',${$('#cedula').val()},'${$('#fn').val()}')">editar</button>
+                                                    <button class="btn btn-sm btn-danger" onClick="borrar(${respuesta.id})">borrar</button>
+                                                </td>
+                                            </tr>`)
+                                mymodal.hide()
+                            }
+                    })
+                })
+
+                //Actualizar
+                $('#actualizar').on('click', function(){
+                    $.ajax({
+                        url: 'actualizar.php',
+                        type: 'POST',
+                        data: {
+                            id: id,
+                            nombre: $('#nombre').val(),
+                            cedula: $('#cedula').val(),
+                            fn: $('#fn').val()
+                        },
+                        dataType: 'json',
+                        success: function(respuesta){
+                            if(respuesta.ejecuto){
+                                $('#'+id).replaceWith(`<tr id="${id}">
+                                                <td>${$('#nombre').val()}</td>
+                                                <td>${$('#cedula').val()}</td>
+                                                <td>${$('#fn').val()}</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-success" onClick="editar(${id},'${$('#nombre').val()}',${$('#cedula').val()},'${$('#fn').val()}')">editar</button>
+                                                    <button class="btn btn-sm btn-danger" onClick="borrar(${id})">borrar</button>
+                                                </td>
+                                            </tr>`)
+                                $('#formulario')[0].reset()
+                                $('#guardar').show('slow')
+                                $('#actualizar').hide('slow')
+                            }
+                        }
+                    })
+                })
+            })
+
+            function borrar(idPersona){
+                $.ajax({
+                    url: 'borrar.php',
+                    type: 'POST',
+                    data: {
+                        id: idPersona
+                    },
+                    dataType: 'json',
+                    success: function(respuesta){
+                        console.log(respuesta)
+                    }
+                })
+                $('#'+idPersona).hide('slow')
+            }
+
+            function editar(idP, nombre, cedula, fn){
+                id = idP
+                $('#nombre').val(nombre)
+                $('#cedula').val(cedula)
+                $('#fn').val(fn)
+                mymodal.show()
+                $('#guardar').hide('slow')
+                $('#actualizar').show('slow')
+            }
+        </script>
+    </body>
 </html>
