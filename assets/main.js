@@ -1,8 +1,12 @@
-function enviarPeticion(url, datos, callback){
+function enviarPeticion(clase, metodo, parametros, callback){
 	$.ajax({
-        url: url,
+        url: 'libs/Route.php',
         type: 'POST',
-        data: datos,
+        data: {
+            clase: clase,
+            metodo: metodo,
+            parametros: parametros
+        },
         dataType: 'json',
         success: function(respuesta){
         	if(respuesta.ejecuto){
@@ -15,7 +19,7 @@ function enviarPeticion(url, datos, callback){
 }
 
 function parsearFormulario(formulario){
-    let datosFormulario = $(formulario).serializeArray()
+    let datosFormulario = $(formulario).serializeArray()    
     let datos = {}
     for(let i = 0; i < datosFormulario.length; i++){
         datos[datosFormulario[i].name] = datosFormulario[i].value

@@ -84,7 +84,7 @@
                 })
 
                 //Consultar
-                enviarPeticion('consultar.php', {}, function(respuesta){
+                enviarPeticion('Personas','consultar', {1:1}, function(respuesta){
                     for(let i = 0; i < respuesta.registros.length; i++){
                         $('#contenido').append(`<tr id="${respuesta.registros[i].id}">
                                                     <td>${respuesta.registros[i].nombre}</td>
@@ -101,16 +101,16 @@
                 //Insertar
                 $('#formulario').on('submit', function(e){
                     e.preventDefault()
-                    let datos = parsearFormulario($('#formulario'))                    
-                    enviarPeticion('insertar.php', datos, function(respuesta){
+                    let datos = parsearFormulario($('#formulario'))
+                    enviarPeticion('Personas','insertar', datos, function(respuesta){
                         if(respuesta.ejecuto){
                                 $('#contenido').append(`<tr id="${respuesta.id}">
                                                 <td>${$('#nombre').val()}</td>
                                                 <td>${$('#cedula').val()}</td>
                                                 <td>${$('#fn').val()}</td>
                                                 <td>
-                                                    <button class="btn btn-sm btn-success" onClick="editar(${respuesta.id},'${$('#nombre').val()}',${$('#cedula').val()},'${$('#fn').val()}')">editar</button>
-                                                    <button class="btn btn-sm btn-danger" onClick="borrar(${respuesta.id})">borrar</button>
+                                                    <button class="btn btn-sm btn-success" onClick="editar(${respuesta.id},'${$('#nombre').val()}',${$('#cedula').val()},'${$('#fn').val()}')">Editar</button>
+                                                    <button class="btn btn-sm btn-danger" onClick="borrar(${respuesta.id})">Borrar</button>
                                                 </td>
                                             </tr>`)
                                 mymodal.hide()
