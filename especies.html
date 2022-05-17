@@ -11,7 +11,7 @@
             <div class="row mt-5">
                 <div class="col">
                     <button type="button" class="btn btn-primary" id="nuevo">
-                        Nueva persona
+                        Nueva especie
                       </button>
                 </div>
             </div>
@@ -21,8 +21,7 @@
                         <thead>
                             <tr>
                                 <th>Nombre</th>
-                                <th>Cédula</th>
-                                <th>Fecha de nacimiento</th>
+                                <th>Opciones</th>
                             </tr>
                             </thead>
                         <tbody id="contenido"></tbody>
@@ -35,7 +34,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Crear persona</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Crear especie</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
@@ -43,18 +42,6 @@
                             <div class="mb-3">
                                 <label class="form-label" for="nombre">Nombre:</label>
                                 <input class="form-control" type="text" name="nombre" id="nombre" required="required">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="cedula">Cédula:</label>
-                                <input class="form-control" type="number" name="cedula" id="cedula">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="altura">Altura:</label>
-                                <input class="form-control" type="number" name="altura" id="altura">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="fn">Fecha nacimiento:</label>
-                                <input class="form-control" type="date" name="fn" id="fn">
                             </div>
                         </form>
                     </div>
@@ -81,17 +68,17 @@
                 $('#nuevo').on('click', function(){
                     mymodal.show()
                     $('#formulario')[0].reset()
+                    $('#actualizar').hide()
+                    $('#guardar').show()
                 })
 
                 //Consultar
-                enviarPeticion('Personas','consultar', {1:1}, function(respuesta){
+                enviarPeticion('Especies','consultar', {1:1}, function(respuesta){
                     for(let i = 0; i < respuesta.registros.length; i++){
                         $('#contenido').append(`<tr id="${respuesta.registros[i].id}">
                                                     <td>${respuesta.registros[i].nombre}</td>
-                                                    <td>${respuesta.registros[i].cedula}</td>
-                                                    <td>${respuesta.registros[i].fecha_nacimiento}</td>
                                                     <td>
-                                                        <button class="btn btn-sm btn-success" onClick="editar(${respuesta.registros[i].id},'${respuesta.registros[i].nombre}',${respuesta.registros[i].cedula},'${respuesta.registros[i].fecha_nacimiento}')">Editar</button>
+                                                        <button class="btn btn-sm btn-success" onClick="editar(${respuesta.registros[i].id},'${respuesta.registros[i].nombre}')">Editar</button>
                                                         <button class="btn btn-sm btn-danger" onClick="borrar(${respuesta.registros[i].id})">Borrar</button>
                                                     </td>
                                                 </tr>`)
@@ -102,74 +89,44 @@
                 $('#formulario').on('submit', function(e){
                     e.preventDefault()
                     let datos = parsearFormulario($('#formulario'))
-                    enviarPeticion('Personas','insertar', datos, function(respuesta){
-                        if(respuesta.ejecuto){
-                                $('#contenido').append(`<tr id="${respuesta.id}">
-                                                <td>${$('#nombre').val()}</td>
-                                                <td>${$('#cedula').val()}</td>
-                                                <td>${$('#fn').val()}</td>
-                                                <td>
-                                                    <button class="btn btn-sm btn-success" onClick="editar(${respuesta.id},'${$('#nombre').val()}',${$('#cedula').val()},'${$('#fn').val()}')">Editar</button>
-                                                    <button class="btn btn-sm btn-danger" onClick="borrar(${respuesta.id})">Borrar</button>
-                                                </td>
-                                            </tr>`)
-                                mymodal.hide()
-                            }
+                    enviarPeticion('Especies','insertar', datos, function(respuesta){
+                            $('#contenido').append(`<tr id="${respuesta.id}">
+                                            <td>${$('#nombre').val()}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-success" onClick="editar(${respuesta.id},'${$('#nombre').val()}')">Editar</button>
+                                                <button class="btn btn-sm btn-danger" onClick="borrar(${respuesta.id})">Borrar</button>
+                                            </td>
+                                        </tr>`)
+                            mymodal.hide()
                     })
                 })
 
                 //Actualizar
                 $('#actualizar').on('click', function(){
-                    $.ajax({
-                        url: 'actualizar.php',
-                        type: 'POST',
-                        data: {
-                            id: id,
-                            nombre: $('#nombre').val(),
-                            cedula: $('#cedula').val(),
-                            fn: $('#fn').val()
-                        },
-                        dataType: 'json',
-                        success: function(respuesta){
-                            if(respuesta.ejecuto){
-                                $('#'+id).replaceWith(`<tr id="${id}">
+                    let datos = parsearFormulario($('#formulario'))
+                    datos.id = id
+                    enviarPeticion('Especies', 'actualizar', datos, function(respuesta){
+                        $('#'+id).replaceWith(`<tr id="${id}">
                                                 <td>${$('#nombre').val()}</td>
-                                                <td>${$('#cedula').val()}</td>
-                                                <td>${$('#fn').val()}</td>
                                                 <td>
                                                     <button class="btn btn-sm btn-success" onClick="editar(${id},'${$('#nombre').val()}',${$('#cedula').val()},'${$('#fn').val()}')">editar</button>
                                                     <button class="btn btn-sm btn-danger" onClick="borrar(${id})">borrar</button>
                                                 </td>
                                             </tr>`)
-                                $('#formulario')[0].reset()
-                                $('#guardar').show('slow')
-                                $('#actualizar').hide('slow')
-                            }
-                        }
+                        mymodal.hide()
                     })
                 })
             })
 
             function borrar(idPersona){
-                $.ajax({
-                    url: 'borrar.php',
-                    type: 'POST',
-                    data: {
-                        id: idPersona
-                    },
-                    dataType: 'json',
-                    success: function(respuesta){
-                        console.log(respuesta)
-                    }
+                enviarPeticion('Especies', 'eliminar', {id: idPersona}, function(respuesta){
+                    $('#'+idPersona).hide('slow')    
                 })
-                $('#'+idPersona).hide('slow')
             }
 
-            function editar(idP, nombre, cedula, fn){
+            function editar(idP, nombre){
                 id = idP
                 $('#nombre').val(nombre)
-                $('#cedula').val(cedula)
-                $('#fn').val(fn)
                 mymodal.show()
                 $('#guardar').hide('slow')
                 $('#actualizar').show('slow')
