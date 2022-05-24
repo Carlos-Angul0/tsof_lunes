@@ -41,15 +41,7 @@
                 e.preventDefault()
                 let datos = parsearFormulario($('#formulario'))
                 enviarPeticion('Usuarios', 'autenticar', datos, function(respuesta){
-                    if(respuesta.registros.length == 0){
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Credenciales erroneas'
-                        })
-                    }else{
-                        window.location.href = 'personas'
-                    }
+                    window.location.href = 'personas'
                 })
             })
         })

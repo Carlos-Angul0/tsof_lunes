@@ -12,7 +12,11 @@ function enviarPeticion(clase, metodo, parametros, callback){
         	if(respuesta.ejecuto){
             	callback(respuesta)
             }else{
-            	console.log(respuesta.msg)
+            	Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: respuesta.error
+                })
             }
         }
     })
