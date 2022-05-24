@@ -1,7 +1,7 @@
 <?php
 class RouterViews{
 	public function __construct(){
-		$view = 'personas';
+		$view = 'login';
 		if(isset($_REQUEST['url'])){
 			$view = $_REQUEST['url'];
 		}
