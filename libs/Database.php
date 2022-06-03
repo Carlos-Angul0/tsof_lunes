@@ -4,7 +4,7 @@ class Database extends mysqli {
 	private $HOST = 'localhost';
 	private $USER = 'root';
 	private $PASS = '';
-	private $DB = 'proyecto1';
+	private $DB = 'proyecto';
 
 	public function __construct(){
 		parent::__construct($this->HOST,$this->USER,$this->PASS,$this->DB);

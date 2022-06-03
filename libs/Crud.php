@@ -3,7 +3,7 @@ require '../libs/Database.php';
 
 class Crud {
 	public $tabla;
-
+	//Consultar
 	public function consultar($parametros){
 		$query = "	SELECT 
 						* 
@@ -12,7 +12,7 @@ class Crud {
 		$db = new Database();
 		return $db->ejecutarConsulta($query);
 	}
-
+	//Insertar
 	public function insertar($parametros){
 		$query_new = '';
 		$query = "INSERT INTO 
@@ -27,7 +27,7 @@ class Crud {
 		$db = new Database();
 		return $db->ejecutarConsulta($query_new);
 	}
-
+	//Actualizar
 	public function actualizar($parametros){
 		$query_new = '';
 		$query = "	UPDATE 
@@ -43,7 +43,7 @@ class Crud {
         $db = new Database();
 		return $db->ejecutarConsulta($query_new);
 	}
-
+	//Eliminar
 	public function eliminar($parametros){
 		$query = "	DELETE FROM 
 						$this->tabla
